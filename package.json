@@ -2,7 +2,7 @@
   "name": "backend-mesto",
   "version": "1.0.0",
   "description": "sprint13",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "lint": "npx eslint",
     "start": "node app.js",
