@@ -7,9 +7,9 @@ const getUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  const { _id } = req.params;
-
-  return User.findById(_id).then((user) => response.status(200).send(user));
+  return User.findById(req.params.userId).then((user) =>
+    res.status(200).send(user)
+  );
 };
 
 const createUser = (req, res) => {

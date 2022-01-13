@@ -8,8 +8,10 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-
-  return Card.create({ name, link }).then((card) => res.status(201).send(card));
+  console.log(req.user._id);
+  return Card.create({ name, link }).then((card) =>
+    res.status(201).send(card)
+  );
 };
 
 const deleteCard = (req, res) => {
