@@ -21,10 +21,14 @@ app.use(bodyParser.json());
 app.use(usersRoutes);
 app.use(cardsRoutes);
 
+app.use((req, res) => {
+  res.status(404).send({ message: "Был запрошен несуществующий роут" });
+});
+
 mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
-  // useCreateIndex: true,
-  // useFindAndModify: false,
+  // useCreateIndex: true, // закомментировать для MongoDB <=v.4.2
+  // useFindAndModify: false, // закомментировать для MongoDB <=v.4.2
 });
 
 app.listen(PORT, () => {

@@ -1,28 +1,28 @@
 const User = require("../models/user");
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   return User.find({})
     .then((users) => {
       res.status(200).send(users);
     })
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   return User.findById(req.params.userId)
     .then((user) => res.status(200).send(user))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   return User.create({ name, about, avatar })
     .then((user) => res.status(201).send(user))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(next);
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   return User.findByIdAndUpdate(
     req.user._id,
@@ -34,10 +34,10 @@ const updateUser = (req, res) => {
     }
   )
     .then((user) => res.status(200).send(user))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(next);
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   return User.findByIdAndUpdate(
     req.user._id,
@@ -47,7 +47,7 @@ const updateAvatar = (req, res) => {
     }
   )
     .then((user) => res.status(200).send(user))
-    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(next);
 };
 
 module.exports = {
