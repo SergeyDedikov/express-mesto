@@ -13,8 +13,20 @@ router.delete("/cards/:cardId", deleteCard);
 router.put("/cards/:cardId/likes", likeCard);
 router.delete("/cards/:cardId/likes", dislikeCard);
 
-/* router.use((req, res) => {
-  res.status(404).send({ message: `Ресурс по адресу "${req.path}" не найден` });
-}); */
+// -- Обработаем ошибки роута карточек
+
+router.use((err, req, res, next) => {
+  console.log(err.name);
+  if (err.name === "ValidationError") {
+    res
+      .status(400)
+      .send({ message: "Переданы некорректные данные карточки" });
+  } else if (err.name === "CastError") {
+    res.status(404).send({ message: "Карточка не найдена" });
+  } else {
+    res.status(500).send({ message: "На сервере произошла ошибка" });
+  }
+  //next();
+});
 
 module.exports = router;
