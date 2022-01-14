@@ -1,23 +1,25 @@
 const User = require("../models/user");
 
 const getUsers = (req, res) => {
-  return User.find({}).then((users) => {
-    res.status(200).send(users);
-  });
+  return User.find({})
+    .then((users) => {
+      res.status(200).send(users);
+    })
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const getUser = (req, res) => {
-  return User.findById(req.params.userId).then((user) =>
-    res.status(200).send(user)
-  );
+  return User.findById(req.params.userId)
+    .then((user) => res.status(200).send(user))
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  return User.create({ name, about, avatar }).then((user) =>
-    res.status(201).send(user)
-  );
+  return User.create({ name, about, avatar })
+    .then((user) => res.status(201).send(user))
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const updateUser = (req, res) => {
@@ -30,7 +32,9 @@ const updateUser = (req, res) => {
       runValidators: true, // данные будут валидированы перед изменением
       upsert: true, // если пользователь не найден, он будет создан
     }
-  ).then((user) => res.status(200).send(user));
+  )
+    .then((user) => res.status(200).send(user))
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 const updateAvatar = (req, res) => {
@@ -41,7 +45,9 @@ const updateAvatar = (req, res) => {
     {
       new: true,
     }
-  ).then((user) => res.status(200).send(user));
+  )
+    .then((user) => res.status(200).send(user))
+    .catch((err) => res.status(500).send({ message: "Произошла ошибка" }));
 };
 
 module.exports = {
