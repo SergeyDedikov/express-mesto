@@ -6,6 +6,11 @@ const {
   updateUser,
   updateAvatar,
 } = require("../controllers/users");
+const {
+  BADREQUEST_ERROR_CODE,
+  NOTFOUND_ERROR_CODE,
+  DEFAULT_ERROR_CODE,
+} = require("../utils/constants");
 
 router.get("/users", getUsers);
 router.get("/users/:userId", getUser);
@@ -19,12 +24,14 @@ router.use((err, req, res, next) => {
   console.log(err.name);
   if (err.name === "ValidationError") {
     res
-      .status(400)
+      .status(BADREQUEST_ERROR_CODE)
       .send({ message: "Переданы некорректные данные пользователя" });
   } else if (err.name === "CastError") {
-    res.status(404).send({ message: "Пользователь не найден" });
+    res.status(NOTFOUND_ERROR_CODE).send({ message: "Пользователь не найден" });
   } else {
-    res.status(500).send({ message: "На сервере произошла ошибка" });
+    res
+      .status(DEFAULT_ERROR_CODE)
+      .send({ message: "На сервере произошла ошибка" });
   }
   //next();
 });
