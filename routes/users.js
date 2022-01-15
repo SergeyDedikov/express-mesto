@@ -21,7 +21,6 @@ router.patch("/users/me/avatar", updateAvatar);
 // -- Обработаем ошибки роута пользователя
 
 router.use((err, req, res, next) => {
-  console.log(err.name);
   if (err.name === "ValidationError") {
     res
       .status(BADREQUEST_ERROR_CODE)
