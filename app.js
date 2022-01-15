@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const usersRoutes = require("./routes/users");
 const cardsRoutes = require("./routes/cards");
+const { NOTFOUND_ERROR_CODE } = require("./utils/constants");
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.use(usersRoutes);
 app.use(cardsRoutes);
 
 app.use((req, res) => {
-  res.status(404).send({ message: "Был запрошен несуществующий роут" });
+  res.status(NOTFOUND_ERROR_CODE).send({ message: "Был запрошен несуществующий роут" });
 });
 
 mongoose.connect("mongodb://localhost:27017/mestodb", {
