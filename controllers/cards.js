@@ -1,3 +1,5 @@
+const BadRequestError = require("../errors/bad-request-error");
+const NotFoundError = require("../errors/not-found-error");
 const Card = require("../models/card");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 
@@ -11,6 +13,9 @@ const getCards = (req, res, next) =>
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
   return Card.create({ name, link, owner: req.user._id })
+    .orFail(
+      new BadRequestError(`Переданы некорректные данные при создании карточки`)
+    )
     .then((card) => res.status(CREATED_SUCCESS_CODE).send(card))
     .catch(next);
 };
@@ -18,7 +23,7 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .orFail(new NotFoundError(`Карточка с id ${cardId} не найдена`))
+    .orFail(new NotFoundError(`Карточка с указанным _id ${cardId} не найдена`))
     .then((card) => res.status(OK_SUCCESS_CODE).send(card))
     .catch(next);
 };
@@ -30,7 +35,19 @@ const likeCard = (req, res, next) =>
     { new: true }
   )
     .then((card) => res.status(OK_SUCCESS_CODE).send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        next(
+          new BadRequestError(
+            "Переданы некорректные данные для постановки лайка"
+          )
+        );
+      } else if (err.name === "CastError") {
+        next(new NotFoundError("Передан несуществующий _id карточки"));
+      } else {
+        next(err);
+      }
+    });
 
 const dislikeCard = (req, res, next) =>
   Card.findByIdAndUpdate(
@@ -39,7 +56,17 @@ const dislikeCard = (req, res, next) =>
     { new: true }
   )
     .then((card) => res.status(OK_SUCCESS_CODE).send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        next(
+          new BadRequestError("Переданы некорректные данные для снятия лайка")
+        );
+      } else if (err.name === "CastError") {
+        next(new NotFoundError("Передан несуществующий _id карточки"));
+      } else {
+        next(err);
+      }
+    });
 
 module.exports = {
   getCards,
