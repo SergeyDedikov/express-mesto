@@ -1,19 +1,15 @@
 const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 
-const getUsers = (req, res, next) => {
-  return User.find({})
+const getUsers = (req, res, next) => User.find({})
     .then((users) => {
       res.status(OK_SUCCESS_CODE).send(users);
     })
     .catch(next);
-};
 
-const getUser = (req, res, next) => {
-  return User.findById(req.params.userId)
+const getUser = (req, res, next) => User.findById(req.params.userId)
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
     .catch(next);
-};
 
 const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;

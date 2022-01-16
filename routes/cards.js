@@ -33,7 +33,7 @@ router.use((err, req, res, next) => {
       .status(DEFAULT_ERROR_CODE)
       .send({ message: "На сервере произошла ошибка" });
   }
-  //next();
+  next();
 });
 
 module.exports = router;
