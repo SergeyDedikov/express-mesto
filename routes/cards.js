@@ -22,12 +22,10 @@ router.delete("/cards/:cardId/likes", dislikeCard);
 // -- Обработаем ошибки роута карточек
 
 router.use((err, req, res, next) => {
-  if (err.name === "ValidationError") {
-    res
-      .status(BADREQUEST_ERROR_CODE)
-      .send({ message: "Переданы некорректные данные карточки" });
-  } else if (err.name === "CastError") {
-    res.status(NOTFOUND_ERROR_CODE).send({ message: "Карточка не найдена" });
+  if (err.name === "ValidationError" || err.name === "BadRequestError") {
+    res.status(BADREQUEST_ERROR_CODE).send({ message: err.message });
+  } else if (err.name === "CastError" || err.name === "NotFoundError") {
+    res.status(NOTFOUND_ERROR_CODE).send({ message: err.message });
   } else {
     res
       .status(DEFAULT_ERROR_CODE)
