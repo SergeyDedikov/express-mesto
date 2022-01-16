@@ -1,13 +1,15 @@
 const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 
-const getUsers = (req, res, next) => User.find({})
+const getUsers = (req, res, next) =>
+  User.find({})
     .then((users) => {
       res.status(OK_SUCCESS_CODE).send(users);
     })
     .catch(next);
 
-const getUser = (req, res, next) => User.findById(req.params.userId)
+const getUser = (req, res, next) =>
+  User.findById(req.params.userId)
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
     .catch(next);
 
@@ -27,7 +29,6 @@ const updateUser = (req, res, next) => {
     {
       new: true, // обработчик then получит на вход обновлённую запись
       runValidators: true, // данные будут валидированы перед изменением
-      upsert: true, // если пользователь не найден, он будет создан
     }
   )
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
@@ -41,6 +42,7 @@ const updateAvatar = (req, res, next) => {
     { avatar },
     {
       new: true,
+      runValidators: true,
     }
   )
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
