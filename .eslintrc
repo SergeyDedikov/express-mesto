@@ -3,5 +3,11 @@
   "rules": {
     "no-underscore-dangle": ["error", { "allow": ["_id"] }],
     "no-console": ["error", { "allow": ["log"] }]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["middlewares/error-handler.js"],
+      "rules": { "no-unused-vars": "off" }
+    }
+  ]
 }

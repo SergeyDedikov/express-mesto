@@ -4,7 +4,6 @@ const {
   DEFAULT_ERROR_CODE,
 } = require("../utils/constants");
 
-// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   console.log(err.name);
   switch (err.name) {
