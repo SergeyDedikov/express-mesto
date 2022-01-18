@@ -32,8 +32,8 @@ app.use((req, res) => {
 mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
   // следующие опции нужно закомментировать для MongoDB <=v.4.2
-  useCreateIndex: true,
-  useFindAndModify: false,
+  // useCreateIndex: true,
+  // useFindAndModify: false,
 });
 
 app.listen(PORT, () => {

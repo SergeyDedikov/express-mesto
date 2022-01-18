@@ -1,4 +1,3 @@
-const BadRequestError = require("../errors/bad-request-error");
 const NotFoundError = require("../errors/not-found-error");
 const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
@@ -25,17 +24,7 @@ const createUser = (req, res, next) => {
 
   return User.create({ name, about, avatar })
     .then((user) => res.status(CREATED_SUCCESS_CODE).send(user))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(
-          new BadRequestError(
-            "Переданы некорректные данные при создании пользователя"
-          )
-        );
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const updateUser = (req, res, next) => {
