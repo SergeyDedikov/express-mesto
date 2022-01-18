@@ -5,7 +5,6 @@ const {
 } = require("../utils/constants");
 
 const errorHandler = (err, req, res, next) => {
-  console.log(err.name);
   switch (err.name) {
     case "CastError":
     case "ValidationError":
