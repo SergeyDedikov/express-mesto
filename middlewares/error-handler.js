@@ -13,9 +13,6 @@ const errorHandler = (err, req, res, next) => {
         .status(BADREQUEST_ERROR_CODE)
         .send({ message: "Переданы некорректные данные" });
       break;
-    case "BadRequestError":
-      res.status(BADREQUEST_ERROR_CODE).send({ message: err.message });
-      break;
     case "NotFoundError":
       res.status(NOTFOUND_ERROR_CODE).send({ message: err.message });
       break;
