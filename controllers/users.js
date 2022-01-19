@@ -37,6 +37,7 @@ const updateUser = (req, res, next) => {
       runValidators: true, // данные будут валидированы перед изменением
     }
   )
+    .orFail(new NotFoundError(`Пользователь с указанным ID не найден`))
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
     .catch(next);
 };
@@ -51,6 +52,7 @@ const updateAvatar = (req, res, next) => {
       runValidators: true,
     }
   )
+    .orFail(new NotFoundError(`Пользователь с указанным ID не найден`))
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
     .catch(next);
 };
