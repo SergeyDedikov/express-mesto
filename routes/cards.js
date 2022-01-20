@@ -6,14 +6,11 @@ const {
   likeCard,
   dislikeCard,
 } = require("../controllers/cards");
-const errorHandler = require("../middlewares/error-handler");
 
 router.get("/cards", getCards);
 router.post("/cards", createCard);
 router.delete("/cards/:cardId", deleteCard);
 router.put("/cards/:cardId/likes", likeCard);
 router.delete("/cards/:cardId/likes", dislikeCard);
-
-router.use(errorHandler);
 
 module.exports = router;
