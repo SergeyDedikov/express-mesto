@@ -27,6 +27,11 @@ const userSchema = new Schema({
       message: "Неправильный формат почты",
     },
   },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8,
+  }
 });
 
 module.exports = model("user", userSchema);

@@ -1,5 +1,7 @@
+const bcrypt = require('bcryptjs');
+
 const NotFoundError = require("../errors/not-found-error");
-const User = require("../models/user").default;
+const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 
 const getUsers = (req, res, next) =>
@@ -20,7 +22,7 @@ const getUser = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
   return User.create({ name, about, avatar })
     .then((user) => res.status(CREATED_SUCCESS_CODE).send(user))
