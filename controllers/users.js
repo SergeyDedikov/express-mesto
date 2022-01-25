@@ -76,14 +76,16 @@ const login = (req, res) => {
           // хеши не совпали — отклоняем промис
           return Promise.reject(new Error("Неправильные почта или пароль"));
         }
-        // аутентификация успешна — вернём токен
-        return res.send({
-          token: jwt.sign(
-            { _id: user._id },
-            "super-strong-secret",
-            { expiresIn: "7d" }
-          ),
+        // аутентификация успешна — создадим токен на 7 дней
+        const token = jwt.sign({ _id: user._id }, "secret-string", {
+          expiresIn: "7d",
         });
+        // вернём куку с токеном
+        return res
+          .cookie("jwt", token, {
+            httpOnly: true,
+          })
+          .end();
       });
     })
     .catch((err) => {
