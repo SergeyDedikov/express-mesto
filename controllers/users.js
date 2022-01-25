@@ -1,5 +1,5 @@
 const NotFoundError = require("../errors/not-found-error");
-const User = require("../models/user");
+const User = require("../models/user").default;
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 
 const getUsers = (req, res, next) =>

@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const isEmail = require("validator/lib/isEmail");
 
 const userSchema = new Schema({
   name: {
@@ -17,6 +18,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (v) => isEmail(v),
+      message: "Неправильный формат почты",
+    },
+  },
 });
 
-module.exports = model('user', userSchema);
+module.exports = model("user", userSchema);
