@@ -1,4 +1,5 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 const NotFoundError = require("../errors/not-found-error");
@@ -61,10 +62,40 @@ const updateAvatar = (req, res, next) => {
     .catch(next);
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error("Неправильные почта или пароль"));
+      }
+      // сравниваем хеши паролей
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          // хеши не совпали — отклоняем промис
+          return Promise.reject(new Error("Неправильные почта или пароль"));
+        }
+        // аутентификация успешна — вернём токен
+        return res.send({
+          token: jwt.sign(
+            { _id: user._id },
+            "super-strong-secret",
+            { expiresIn: "7d" }
+          ),
+        });
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   updateAvatar,
+  login,
 };
