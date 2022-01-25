@@ -1,13 +1,14 @@
 const express = require("express");
-
-const { PORT = 3000 } = process.env;
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+
 const usersRoutes = require("./routes/users");
 const cardsRoutes = require("./routes/cards");
+const { createUser, login } = require("./controllers/users");
 const errorHandler = require("./middlewares/error-handler");
 const NotFoundError = require("./errors/not-found-error");
 
+const { PORT = 3000 } = process.env;
 const app = express();
 
 // -- Midleware for userId
@@ -21,8 +22,15 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json());
+
+// -- Auths routes
+app.post("/signin", login);
+app.post("/signup", createUser);
+
+// -- Others routes
 app.use(usersRoutes);
 app.use(cardsRoutes);
+
 app.use((req, res, next) => {
   next(new NotFoundError("Был запрошен несуществующий роут"));
 });
