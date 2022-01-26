@@ -1,6 +1,7 @@
-const NotFoundError = require("../errors/not-found-error");
 const Card = require("../models/card");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
+const NotFoundError = require("../errors/not-found-error");
+const Forbidden = require("../errors/forbidden-error");
 
 const getCards = (req, res, next) =>
   Card.find({})
@@ -27,7 +28,7 @@ const deleteCard = (req, res, next) => {
       .then((card) => res.status(OK_SUCCESS_CODE).send(card))
       .catch(next);
   }
-  return next(new NotFoundError('Запрещено удалять чужие карточки!'));
+  return next(new Forbidden("Запрещено удалять чужие карточки!"));
 };
 
 const likeCard = (req, res, next) => {

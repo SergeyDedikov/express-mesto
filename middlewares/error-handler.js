@@ -4,11 +4,18 @@ const {
   DEFAULT_ERROR_CODE,
   FORBIDDEN_ERROR_CODE,
   UNAUTHORIZED_ERROR_CODE,
+  CONFLICT_ERROR_CODE,
 } = require("../utils/constants");
 
 const errorHandler = (err, req, res, next) => {
-  console.log(err.name);
-  const { name, message } = err;
+  console.log(err.name, err.code);
+  const { code, name, message } = err;
+
+  if (name === "MongoServerError" && code === 11000) {
+    res
+      .status(CONFLICT_ERROR_CODE)
+      .send({ message: "Пользователь с данным email уже существует" });
+  }
 
   switch (name) {
     case "CastError":
