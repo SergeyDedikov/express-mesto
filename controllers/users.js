@@ -1,9 +1,10 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 const NotFoundError = require("../errors/not-found-error");
-const User = require("../models/user");
+const ValidationError = require("../errors/validation-error");
 
 const getUsers = (req, res, next) =>
   User.find({})
@@ -77,13 +78,17 @@ const login = (req, res, next) => {
     .select("+password")
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error("Неправильные почта или пароль"));
+        return Promise.reject(
+          new ValidationError("Неправильные почта или пароль")
+        );
       }
       // сравниваем хеши паролей
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           // хеши не совпали — отклоняем промис
-          return Promise.reject(new Error("Неправильные почта или пароль"));
+          return Promise.reject(
+            new ValidationError("Неправильные почта или пароль")
+          );
         }
         // аутентификация успешна — создадим токен на 7 дней
         const token = jwt.sign({ _id: user._id }, "secret-string", {
