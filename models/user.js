@@ -41,4 +41,10 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.methods.toJSON = function noShowProtectedKeys() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
+
 module.exports = model("user", userSchema);
