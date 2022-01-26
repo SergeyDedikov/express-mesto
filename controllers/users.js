@@ -22,6 +22,16 @@ const getUser = (req, res, next) => {
     .catch(next);
 };
 
+const getCurentUser = (req, res, next) => {
+  const { _id } = req.user;
+  return User.findById(_id)
+    .orFail(
+      new NotFoundError(`Пользователь не определён`)
+    )
+    .then((user) => res.status(OK_SUCCESS_CODE).send(user))
+    .catch(next);
+};
+
 const createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
@@ -96,6 +106,7 @@ const login = (req, res) => {
 module.exports = {
   getUsers,
   getUser,
+  getCurentUser,
   createUser,
   updateUser,
   updateAvatar,
