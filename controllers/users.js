@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
 const NotFoundError = require("../errors/not-found-error");
-const ValidationError = require("../errors/validation-error");
+const Unauthorized = require("../errors/unauthorized-error");
 
 const getUsers = (req, res, next) =>
   User.find({})
@@ -79,7 +79,7 @@ const login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         return Promise.reject(
-          new ValidationError("Неправильные почта или пароль")
+          new Unauthorized("Неправильные почта или пароль")
         );
       }
       // сравниваем хеши паролей
@@ -87,7 +87,7 @@ const login = (req, res, next) => {
         if (!matched) {
           // хеши не совпали — отклоняем промис
           return Promise.reject(
-            new ValidationError("Неправильные почта или пароль")
+            new Unauthorized("Неправильные почта или пароль")
           );
         }
         // аутентификация успешна — создадим токен на 7 дней
