@@ -1,15 +1,23 @@
 const { Schema, model } = require("mongoose");
+const { isURL } = require("validator");
 
 const cardSchema = new Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, "Название места обязательно"],
+    minlength: [2, "Слишком короткое нзвание"],
+    maxlength: [30, "Слишком длинное название"],
   },
   link: {
     type: String,
-    required: true,
+    required: [true, "Должна быть указана ссылка"],
+    validate: {
+      validator: (v) =>
+        isURL(v, {
+          require_protocol: true, // валидируем ссылку
+        }),
+      message: "Неправильный формат ссылки",
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,
