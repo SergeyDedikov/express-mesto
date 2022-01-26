@@ -22,7 +22,7 @@ const getUser = (req, res, next) => {
     .catch(next);
 };
 
-const getCurentUser = (req, res, next) => {
+const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
   return User.findById(_id)
     .orFail(
@@ -106,7 +106,7 @@ const login = (req, res) => {
 module.exports = {
   getUsers,
   getUser,
-  getCurentUser,
+  getCurrentUser,
   createUser,
   updateUser,
   updateAvatar,
