@@ -26,9 +26,7 @@ const getCurrentUser = (req, res, next) => {
   console.log(req.user);
   const { _id } = req.user;
   return User.findById(_id)
-    .orFail(
-      new NotFoundError(`Пользователь не определён`)
-    )
+    .orFail(new NotFoundError(`Пользователь не определён`))
     .then((user) => res.status(OK_SUCCESS_CODE).send(user))
     .catch(next);
 };
@@ -73,10 +71,11 @@ const updateAvatar = (req, res, next) => {
     .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email })
+    .select("+password")
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error("Неправильные почта или пароль"));
@@ -89,7 +88,7 @@ const login = (req, res) => {
         }
         // аутентификация успешна — создадим токен на 7 дней
         const token = jwt.sign({ _id: user._id }, "secret-string", {
-          expiresIn: "7d",
+          expiresIn: "30s",
         });
         // вернём куку с токеном
         return res
@@ -99,9 +98,7 @@ const login = (req, res) => {
           .end();
       });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports = {

@@ -38,9 +38,12 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+    select: false,
   },
 });
 
+// уберём поле пароля из отдаваемого объекта
+// при регистрации нового пользователя
 userSchema.methods.toJSON = function noShowProtectedKeys() {
   const obj = this.toObject();
   delete obj.password;
