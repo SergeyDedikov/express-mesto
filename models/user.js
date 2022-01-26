@@ -4,14 +4,14 @@ const { isEmail, isURL } = require("validator");
 const userSchema = new Schema({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, "Слишком короткое имя"],
+    maxlength: [30, "Слишком длинное имя"],
     default: "Жак-Ив Кусто",
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, "Недостаточно информации о себе"],
+    maxlength: [30, "Слишком много информации о себе"],
     default: "Исследователь",
   },
   avatar: {
@@ -28,11 +28,11 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Поле email не должно быть пустым"],
     unique: true,
     validate: {
       validator: (v) => isEmail(v),
-      message: "Неправильный формат почты",
+      message: "Неправильный формат email",
     },
   },
   password: {
