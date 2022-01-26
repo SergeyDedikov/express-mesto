@@ -18,10 +18,16 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  return Card.findByIdAndRemove(cardId)
-    .orFail(new NotFoundError(`Карточка с указанным _id ${cardId} не найдена`))
-    .then((card) => res.status(OK_SUCCESS_CODE).send(card))
-    .catch(next);
+  // удаляем только свои карточки
+  if (cardId === req.user._id) {
+    return Card.findByIdAndRemove(cardId)
+      .orFail(
+        new NotFoundError(`Карточка с указанным _id ${cardId} не найдена`)
+      )
+      .then((card) => res.status(OK_SUCCESS_CODE).send(card))
+      .catch(next);
+  }
+  return next(new NotFoundError('Запрещено удалять чужие карточки!'));
 };
 
 const likeCard = (req, res, next) => {
