@@ -23,7 +23,7 @@ const auth = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-
+  console.log(req.user);
   return next(); // пропускаем запрос дальше
 };
 

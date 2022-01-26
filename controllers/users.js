@@ -23,6 +23,7 @@ const getUser = (req, res, next) => {
 };
 
 const getCurrentUser = (req, res, next) => {
+  console.log(req.user);
   const { _id } = req.user;
   return User.findById(_id)
     .orFail(

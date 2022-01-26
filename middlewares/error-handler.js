@@ -13,7 +13,8 @@ const errorHandler = (err, req, res, next) => {
     case "ValidationError":
       res
         .status(BADREQUEST_ERROR_CODE)
-        .send({ message: "Переданы некорректные данные" });
+        // .send({ message: "Переданы некорректные данные" });
+        .send({ message: err.message });
       break;
     case "NotFoundError":
       res.status(NOTFOUND_ERROR_CODE).send({ message: err.message });
