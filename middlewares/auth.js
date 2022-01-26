@@ -1,16 +1,13 @@
 const jwt = require("jsonwebtoken");
 
-const { UNAUTHORIZED_ERROR_CODE } = require("../utils/constants");
-
-const handleAuthError = (res) => {
-  res.status(UNAUTHORIZED_ERROR_CODE).send({ message: "Необходима авторизация" });
-};
+const Unauthorized = require("../errors/unauthorized-error");
+const Forbidden = require("../errors/forbidden-error");
 
 const auth = (req, res, next) => {
   const token = req.cookies.jwt; // извлекаем токен из куков
 
   if (!token) {
-    return handleAuthError(res);
+    return next(new Forbidden("Необходима авторизация"));
   }
 
   let payload;
@@ -19,11 +16,11 @@ const auth = (req, res, next) => {
     // проверяем токен на подлинность
     payload = jwt.verify(token, "secret-string");
   } catch (err) {
-    return handleAuthError(res);
+    return next(new Unauthorized("Некорректный токен"));
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-  console.log(req.user);
+
   return next(); // пропускаем запрос дальше
 };
 
