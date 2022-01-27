@@ -1,5 +1,6 @@
 const { Schema, model } = require("mongoose");
-const { isURL } = require("validator");
+
+const checkUrl = require("../utils/check-url");
 
 const cardSchema = new Schema({
   name: {
@@ -12,10 +13,7 @@ const cardSchema = new Schema({
     type: String,
     required: [true, "Должна быть указана ссылка"],
     validate: {
-      validator: (v) =>
-        isURL(v, {
-          require_protocol: true, // валидируем ссылку
-        }),
+      validator: (v) => checkUrl(v),
       message: "Неправильный формат ссылки",
     },
   },

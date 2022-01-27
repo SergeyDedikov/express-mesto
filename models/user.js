@@ -1,5 +1,7 @@
 const { Schema, model } = require("mongoose");
-const { isEmail, isURL } = require("validator");
+const { isEmail } = require("validator");
+
+const checkUrl = require("../utils/check-url");
 
 const userSchema = new Schema({
   name: {
@@ -19,10 +21,7 @@ const userSchema = new Schema({
     default:
       "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
     validate: {
-      validator: (v) =>
-        isURL(v, {
-          require_protocol: true, // валидируем ссылку
-        }),
+      validator: (v) => checkUrl(v),
       message: "Неправильный формат ссылки",
     },
   },
