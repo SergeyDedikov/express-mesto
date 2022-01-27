@@ -1,4 +1,4 @@
-# Практическая работа №13: Место.Backend
+# Практическая работа №14: Место.Backend
 
 - Описание
 - Особенности
@@ -7,146 +7,141 @@
 
 **Описание**
 
-Практическая работа №13 курса "Веб-разработчик" Яндекс.Практикума — начало курса по бэкенду — создаём сервер в среде Node для проекта Mesto, работаем с базами данных.
+Практическая работа №14 курса "Веб-разработчик" Яндекс.Практикума — продолжаем изучать серверную часть разработки на базе MongoDB и Express.JS
 
 ---
 
 **Особенности**
 
-Подключили фреймворк **Express.js** для работы с сервером и создали точку входа.
+Добавили в схему пользователя электронную почту с валидацией и пароль
 
 ```javascript
-// package.json
-"dependencies": {
-    "body-parser": "^1.19.1",
-    "express": "^4.17.2",
-    "mongoose": "^6.1.6"
+// models/users.js
+email: {
+    type: String,
+    required: [true, "Поле email не должно быть пустым"],
+    unique: true,
+    validate: {
+      validator: (v) => isEmail(v),
+      message: "Неправильный формат email",
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
+```
+
+Расширили возможности контроллера создания пользователя. Хешируем пароль криптомодулем **bcriptjs** 
+
+```javascript
+// controllers/users.js
+const createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
+
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((user) => res.status(CREATED_SUCCESS_CODE).send(user))
+    .catch(next);
+};
+```
+
+Создаём новый контроллер для авторизации пользователя login. Создаём _cookie_ с токеном
+
+```javascript
+// controllers/users.js
+// сравниваем хеши паролей
+      return bcrypt.compare(password, user.password)
+...
+// аутентификация успешна — создадим токен на 7 дней
+        const token = jwt.sign({ _id: user._id }, "secret-string", {
+          expiresIn: "7d",
+        });
+        // вернём куку с токеном
+        return res
+          .cookie("jwt", token, {
+            httpOnly: true,
+          })
+```
+
+Сделали middleware для авторизации
+
+```javascript
+// middlewares/auth.js
+
+// извлекаем токен из куков запроса
+  const token = req.cookies.jwt;
+...
+let payload;
+  try {
+    // проверяем токен на подлинность
+    payload = jwt.verify(token, "secret-string");
+  } catch (err) {
+    return next(new Unauthorized("Некорректный токен"));
   }
-...
-// app.js
-const express = require("express");
-const app = express();
+  req.user = payload; // записываем пейлоуд в объект запроса
 ```
 
-Создаём порт локального сервера и прослушиваем его:
+Все запросы к базе данных валидируются. Ошибки обрабатываются централизованно
 
 ```javascript
-// app.js
-const { PORT = 3000 } = process.env;
-...
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
-```
+// middlewares/error-handler.js
+const errorHandler = (err, req, res, next) => {
+  const { code, name, message } = err;
 
-Устанавливаем сервер для базы данных **MongoDB** и подключаемся к нему:
-
-```javascript
-// app.js
-const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/mestodb", {
-  useNewUrlParser: true,
-  // следующие опции нужно закомментировать для MongoDB <=v.4.2
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-```
-
-Создаём модели для БД, используя схемы:
-
-```javascript
-// /models/user.js
-const { Schema, model } = require("mongoose");
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  about: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  avatar: {
-    type: String,
-    required: true,
-  },
-});
-module.exports = model('user', userSchema);
-```
-
-Используем контроллеры запросов к базе данных для рутов пользователя и карточки:
-
-```javascript
-// /controllers/users.js
-const User = require("../models/user");
-const { OK_SUCCESS_CODE, CREATED_SUCCESS_CODE } = require("../utils/constants");
-
-const getUsers = (req, res, next) => {
-  return User.find({})
-    .then((users) => {
-      res.status(OK_SUCCESS_CODE).send(users);
-    })
-    .catch(next);
-};
-
-const getUser = (req, res, next) => {
-  return User.findById(req.params.userId)
-    .then((user) => res.status(OK_SUCCESS_CODE).send(user))
-    .catch(next);
-};
-...
-```
-
-Обрабатываем руты для пользователей и карточек:
-
-```javascript
-// /routes/cards.js
-const router = require("express").Router();
-
-router.get("/cards", getCards);
-router.post("/cards", createCard);
-router.delete("/cards/:cardId", deleteCard);
-router.put("/cards/:cardId/likes", likeCard);
-router.delete("/cards/:cardId/likes", dislikeCard);
-...
-```
-
-Обрабатываем ошибки на сервере:
-
-```javascript
-// /routes/users.js
-router.use((err, req, res, next) => {
-  if (err.name === "ValidationError") {
+  if (
+    (name === "MongoServerError" || name === "MongoError") &&
+    code === 11000
+  ) {
     res
-      .status(BADREQUEST_ERROR_CODE)
-      .send({ message: "Переданы некорректные данные пользователя" });
-  } else if (err.name === "CastError") {
-    res.status(NOTFOUND_ERROR_CODE).send({ message: "Пользователь не найден" });
+      .status(CONFLICT_ERROR_CODE)
+      .send({ message: "Пользователь с данным email уже существует" });
   } else {
-    res
-      .status(DEFAULT_ERROR_CODE)
-      .send({ message: "На сервере произошла ошибка" });
-  }
-});
+    switch (name) {
+      case "CastError":
+        res
+          .status(BADREQUEST_ERROR_CODE)
+          .send({ message: "Переданы некорректные данные" });
+        break;
+      case "ValidationError":
+        res.status(BADREQUEST_ERROR_CODE).send({
+          message: `${Object.values(err.errors)
+            .map((error) => error.message)
+            .join(". ")}`,
+        });
+        break;
 ...
 ```
 
-Временно хардкодим ID нашего пользователя при помощи мидлвары:
+Для валидации ссылок на аватар и карточек создаём свой валидатор на основе реларных выражений
 
 ```javascript
-// app.js
-app.use((req, res, next) => {
-  req.user = {
-    _id: "61e00e9e632223a4fc65b762",
-  };
+// utils/check-url.js
+function checkUrl(str) {
+  return /^https?:\/\/w?w?w?\.?[a-z0-9\-._~:/?#[\]@!$&'()*+,;=]#?/gi.test(str);
+}
 
-  next();
-});
+module.exports = checkUrl;
+
+```
+
+Используем свой валидатор в схемах
+
+```javascript
+// models/cards.js
+...
+link: {
+    type: String,
+    required: [true, "Должна быть указана ссылка"],
+    validate: {
+      validator: (v) => checkUrl(v),
+      message: "Неправильный формат ссылки",
+    },
 ...
 ```
 
 ---
+
+Это — backend. Поэтому ссылок нет. Пока нет.
