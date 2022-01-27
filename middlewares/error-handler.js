@@ -8,10 +8,12 @@ const {
 } = require("../utils/constants");
 
 const errorHandler = (err, req, res, next) => {
-  console.log(err.name, err.code);
   const { code, name, message } = err;
 
-  if (name === "MongoServerError" && code === 11000) {
+  if (
+    (name === "MongoServerError" || name === "MongoError") &&
+    code === 11000
+  ) {
     res
       .status(CONFLICT_ERROR_CODE)
       .send({ message: "Пользователь с данным email уже существует" });
@@ -41,8 +43,7 @@ const errorHandler = (err, req, res, next) => {
       default:
         res
           .status(DEFAULT_ERROR_CODE)
-          // .send({ message: "На сервере произошла ошибка" });
-          .send({ message });
+          .send({ message: "На сервере произошла ошибка" });
     }
   }
 

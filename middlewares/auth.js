@@ -4,7 +4,8 @@ const Unauthorized = require("../errors/unauthorized-error");
 const Forbidden = require("../errors/forbidden-error");
 
 const auth = (req, res, next) => {
-  const token = req.cookies.jwt; // извлекаем токен из куков
+  // извлекаем токен из куков запроса
+  const token = req.cookies.jwt;
 
   if (!token) {
     return next(new Forbidden("Необходима авторизация"));
