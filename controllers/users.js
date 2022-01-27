@@ -92,7 +92,7 @@ const login = (req, res, next) => {
         }
         // аутентификация успешна — создадим токен на 7 дней
         const token = jwt.sign({ _id: user._id }, "secret-string", {
-          expiresIn: "60s",
+          expiresIn: "600s",
         });
         // вернём куку с токеном
         return res

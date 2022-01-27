@@ -19,16 +19,29 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  // удаляем только свои карточки
-  if (cardId === req.user._id) {
-    return Card.findByIdAndRemove(cardId)
-      .orFail(
-        new NotFoundError(`Карточка с указанным _id ${cardId} не найдена`)
-      )
-      .then((card) => res.status(OK_SUCCESS_CODE).send(card))
-      .catch(next);
-  }
-  return next(new Forbidden("Запрещено удалять чужие карточки!"));
+
+  return Card.findById(cardId)
+    .orFail(new NotFoundError(`Карточка с указанным _id ${cardId} не найдена`))
+    .then((card) => {
+      if (card) {
+        // приведём к строке поле owner карточки
+        const owner = card.owner.toString();
+        // сравним наш id со значением owner у карточки
+        if (owner === req.user._id) {
+          return card.remove();
+        }
+        return Promise.reject(
+          new Forbidden("Запрещено удалять чужие карточки!")
+        );
+      }
+      return Promise.reject(new NotFoundError("Карточка не найдена"));
+    })
+    .then(() =>
+      res
+        .status(OK_SUCCESS_CODE)
+        .send({ message: "Карточка удалена безвозвратно!" })
+    )
+    .catch(next);
 };
 
 const likeCard = (req, res, next) => {

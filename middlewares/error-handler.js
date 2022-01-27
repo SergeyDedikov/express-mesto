@@ -18,15 +18,16 @@ const errorHandler = (err, req, res, next) => {
   } else {
     switch (name) {
       case "CastError":
-      case "ValidationError":
         res
           .status(BADREQUEST_ERROR_CODE)
-          // .send({ message: "Переданы некорректные данные" });
-          .send({
-            message: `${Object.values(err.errors)
-              .map((error) => error.message)
-              .join(". ")}`,
-          });
+          .send({ message: "Переданы некорректные данные" });
+        break;
+      case "ValidationError":
+        res.status(BADREQUEST_ERROR_CODE).send({
+          message: `${Object.values(err.errors)
+            .map((error) => error.message)
+            .join(". ")}`,
+        });
         break;
       case "NotFoundError":
         res.status(NOTFOUND_ERROR_CODE).send({ message });
@@ -40,7 +41,8 @@ const errorHandler = (err, req, res, next) => {
       default:
         res
           .status(DEFAULT_ERROR_CODE)
-          .send({ message: "На сервере произошла ошибка" });
+          // .send({ message: "На сервере произошла ошибка" });
+          .send({ message });
     }
   }
 
